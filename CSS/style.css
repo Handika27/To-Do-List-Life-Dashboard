@@ -1,3 +1,8 @@
+/* 1. PERBAIKAN: Reset box-sizing agar padding tidak menambah lebar elemen */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 :root {
     --bg-color: #f0f2f5;
     --card-bg: #ffffff;
@@ -27,6 +32,8 @@ body {
     flex-direction: column;
     align-items: center;
     transition: background-color 0.3s, color 0.3s;
+    /* 2. PERBAIKAN: Mencegah overflow horizontal pada body */
+    overflow-x: hidden; 
 }
 
 #theme-toggle {
@@ -40,12 +47,14 @@ body {
     color: var(--text-primary);
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 10;
 }
 
 .dashboard-container {
     max-width: 1000px;
     width: 100%;
-    margin-top: 40px;
+    /* 3. PERBAIKAN: Jarak atas ditambahkan agar tidak tertimpa tombol Dark Mode */
+    margin-top: 60px; 
 }
 
 .card {
@@ -137,6 +146,7 @@ li {
     display: flex;
     align-items: center;
     gap: 10px;
+    word-break: break-word; /* 4. PERBAIKAN: Agar teks panjang tidak merusak layout */
 }
 
 .task-content.done span {
@@ -171,8 +181,37 @@ li {
     font-weight: bold;
 }
 
+/* 5. PERBAIKAN: Media Query untuk Layar Responsif (HP) */
 @media (max-width: 768px) {
+    body {
+        padding: 15px; /* Kurangi padding body di HP */
+    }
+
     .bottom-grid {
         grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 20px; /* Kurangi padding card agar ruang lebih luas */
+    }
+
+    /* Kecilkan ukuran font raksasa agar muat di layar HP */
+    #current-time {
+        font-size: 2.2rem;
+    }
+    
+    #timer-display {
+        font-size: 2.8rem;
+    }
+
+    /* Ubah input yang bersebelahan menjadi atas-bawah (vertikal) */
+    .input-group {
+        flex-direction: column;
+    }
+
+    /* Buat tombol dalam input-group (Add Task / Add Link) menjadi selebar layar penuh */
+    .input-group .btn {
+        width: 100%;
+        padding: 12px;
     }
 }
