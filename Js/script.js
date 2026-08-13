@@ -103,7 +103,7 @@ btnReset.addEventListener('click', () => {
 updateTimerDisplay();
 
 // --- 3. TO-DO LIST ---
-let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+let tasks = JSON.parse(localStorage.getItem('ccse_tasks')) || [];
 const taskInput = document.getElementById('task-input');
 const btnAddTask = document.getElementById('btn-add-task');
 const taskList = document.getElementById('task-list');
@@ -148,7 +148,7 @@ function renderTasks() {
         li.appendChild(actionsDiv);
         taskList.appendChild(li);
     });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
+    localStorage.setItem('ccse_tasks', JSON.stringify(tasks));
 }
 
 function addTask() {
