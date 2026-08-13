@@ -3,7 +3,7 @@
 A clean, minimalist, and responsive life dashboard web application built as part of the CodingCamp software engineering fundamental course. This dashboard helps users organize their day completely on the client-side without the need for complex server setups.
 
 ## Live Demo
-[Insert Your GitHub Pages Link Here]
+https://handika27.github.io/To-Do-List-Life-Dashboard/
 
 ## Features
 
