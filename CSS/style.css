@@ -92,6 +92,13 @@ body {
     text-align: center;
     color: var(--primary-color);
     margin: 20px 0;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, opacity 0.2s;
+}
+
+#timer-display:hover {
+    transform: scale(1.05); /* Sedikit membesar saat disorot */
+    opacity: 0.8;
 }
 
 .timer-controls {

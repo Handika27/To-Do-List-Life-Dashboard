@@ -15,27 +15,20 @@ themeToggleBtn.addEventListener('click', () => {
 
 // Initialize Custom Name
 let userName = localStorage.getItem('userName') || 'Handika';
-userNameDisplay.textContent = userName;
-
-userNameDisplay.addEventListener('click', () => {
-    const newName = prompt("Enter your name:");
-    if (newName && newName.trim() !== "") {
-        userName = newName.trim();
-        userNameDisplay.textContent = userName;
-        localStorage.setItem('userName', userName);
-    }
-});
+if (userNameDisplay) userNameDisplay.textContent = userName;
 
 // Update Time, Date, and Greeting
 function updateDateTime() {
     const now = new Date();
     
     // Time
-    document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { hour12: false });
+    const timeElem = document.getElementById('current-time');
+    if (timeElem) timeElem.textContent = now.toLocaleTimeString('en-US', { hour12: false });
     
     // Date
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', options);
+    const dateElem = document.getElementById('current-date');
+    if (dateElem) dateElem.textContent = now.toLocaleDateString('en-US', options);
     
     // Greeting
     const hour = now.getHours();
@@ -43,97 +36,117 @@ function updateDateTime() {
     if (hour < 12) greeting = 'Good Morning';
     else if (hour < 18) greeting = 'Good Afternoon';
     
-    document.getElementById('greeting-message').innerHTML = `${greeting}, <span id="user-name-display" style="cursor:pointer;" title="Click to change name">${userName}</span>`;
-    
-    // Re-attach listener after innerHTML update
-    document.getElementById('user-name-display').addEventListener('click', () => {
-        const newName = prompt("Enter your name:");
-        if (newName && newName.trim() !== "") {
-            userName = newName.trim();
-            localStorage.setItem('userName', userName);
-            updateDateTime();
-        }
-    });
+    const greetingElem = document.getElementById('greeting-message');
+    if (greetingElem) {
+        greetingElem.innerHTML = `${greeting}, <span id="user-name-display" style="cursor:pointer;" title="Click to change name">${userName}</span>`;
+        
+        // Re-attach listener after innerHTML update
+        document.getElementById('user-name-display').addEventListener('click', () => {
+            const newName = prompt("Enter your name:", userName);
+            if (newName && newName.trim() !== "") {
+                userName = newName.trim();
+                localStorage.setItem('userName', userName);
+                updateDateTime();
+            }
+        });
+    }
 }
 setInterval(updateDateTime, 1000);
 updateDateTime();
 
-// --- 2. FOCUS TIMER ---
+// --- 2. FOCUS TIMER (Dengan Fitur Popup Klik) ---
 let timerInterval;
-let timeLeft = 25 * 60; // 25 minutes in seconds
+let customMinutes = 25; // Menyimpan durasi waktu yang disetel user
+let timeLeft = customMinutes * 60; // Konversi ke detik
 let isTimerRunning = false;
 
 const timerDisplay = document.getElementById('timer-display');
 const btnStart = document.getElementById('btn-start');
 const btnStop = document.getElementById('btn-stop');
 const btnReset = document.getElementById('btn-reset');
-const timerInput = document.getElementById('timer-input');
-const btnSetTimer = document.getElementById('btn-set-timer');
 
 function updateTimerDisplay() {
+    if (!timerDisplay) return;
     const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
     const s = (timeLeft % 60).toString().padStart(2, '0');
     timerDisplay.textContent = `${m}:${s}`;
 }
 
-btnSetTimer.addEventListener('click', () => {
-    if (isTimerRunning) {
-        alert("Pause timer terlebih dahulu untuk mengubah waktu!");
-        return;
-    }
+// Fitur: Mengklik angka timer untuk mengatur waktu
+if (timerDisplay) {
+    timerDisplay.style.cursor = 'pointer'; // Memastikan kursor berubah jadi tangan
+    timerDisplay.title = 'Click to set timer';
+    
+    timerDisplay.addEventListener('click', () => {
+        if (isTimerRunning) {
+            alert("Pause timer terlebih dahulu untuk mengubah waktu!");
+            return;
+        }
 
-    let customMinutes = parseInt(timerInput.value);
+        let userInput = prompt("Masukkan waktu timer baru (dalam menit):", customMinutes);
 
-    if (isNaN(customMinutes) || customMinutes <= 0) {
-        customMinutes = 25; 
-        timerInput.value = 25;
-    }
-
-    timeLeft = customMinutes * 60;
-    updateTimerDisplay();
-});
-btnStart.addEventListener('click', () => {
-    if (!isTimerRunning) {
-        isTimerRunning = true;
-        // --- BEEP SAAT START ---
-        alarmSound.play();
-        setTimeout(() => { 
-            alarmSound.pause(); 
-            alarmSound.currentTime = 0; 
-        }, 1000);
-
-        timerInterval = setInterval(() => {
-            if (timeLeft > 0) {
-                timeLeft--;
+        if (userInput !== null) {
+            let parsedMinutes = parseInt(userInput);
+            if (!isNaN(parsedMinutes) && parsedMinutes > 0) {
+                customMinutes = parsedMinutes; // Simpan pengaturan terbaru
+                timeLeft = customMinutes * 60; // Update sisa waktu
                 updateTimerDisplay();
             } else {
-                clearInterval(timerInterval);
-                isTimerRunning = false;
-                // --- BEEP SAAT SELESAI (00:00) ---
-                alarmSound.play();
-                setTimeout(() => {
-                    alarmSound.pause();
-                    alarmSound.currentTime = 0;
-                }, 3000);
-
-                alert("Focus session complete!");
+                alert("Mohon masukkan angka yang valid!");
             }
-        }, 1000);
-    }
-});
+        }
+    });
+}
 
-btnStop.addEventListener('click', () => {
-    clearInterval(timerInterval);
-    isTimerRunning = false;
-});
+if (btnStart) {
+    btnStart.addEventListener('click', () => {
+        if (!isTimerRunning) {
+            isTimerRunning = true;
+            // --- BEEP SAAT START ---
+            alarmSound.play();
+            setTimeout(() => { 
+                alarmSound.pause(); 
+                alarmSound.currentTime = 0; 
+            }, 1000);
 
-btnReset.addEventListener('click', () => {
-    clearInterval(timerInterval);
-    isTimerRunning = false;
-    let currentMinutes = parseInt(timerInput.value) || 25;
-    timeLeft = currentMinutes * 60;
-    updateTimerDisplay();
-});
+            timerInterval = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    isTimerRunning = false;
+                    // --- BEEP SAAT SELESAI (00:00) ---
+                    alarmSound.play();
+                    setTimeout(() => {
+                        alarmSound.pause();
+                        alarmSound.currentTime = 0;
+                    }, 3000);
+
+                    alert("Focus session complete!");
+                }
+            }, 1000);
+        }
+    });
+}
+
+if (btnStop) {
+    btnStop.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+    });
+}
+
+if (btnReset) {
+    btnReset.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        // Kembali ke waktu yang terakhir disetel user
+        timeLeft = customMinutes * 60;
+        updateTimerDisplay();
+    });
+}
+
 updateTimerDisplay();
 
 // --- 3. TO-DO LIST ---
@@ -143,6 +156,7 @@ const btnAddTask = document.getElementById('btn-add-task');
 const taskList = document.getElementById('task-list');
 
 function renderTasks() {
+    if (!taskList) return;
     taskList.innerHTML = '';
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
@@ -223,10 +237,14 @@ function deleteTask(index) {
     renderTasks();
 }
 
-btnAddTask.addEventListener('click', addTask);
-taskInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') addTask();
-});
+if (btnAddTask) {
+    btnAddTask.addEventListener('click', addTask);
+}
+if (taskInput) {
+    taskInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
+}
 renderTasks();
 
 // --- 4. QUICK LINKS ---
@@ -237,6 +255,7 @@ const btnAddLink = document.getElementById('btn-add-link');
 const linksContainer = document.getElementById('links-container');
 
 function renderLinks() {
+    if (!linksContainer) return;
     linksContainer.innerHTML = '';
     links.forEach((link, index) => {
         const linkElem = document.createElement('a');
@@ -273,7 +292,7 @@ function addLink() {
     links.push({ name, url });
     linkNameInput.value = '';
     linkUrlInput.value = '';
-    renderTasks(); // To clear task input focus if any
+    // Hapus renderTasks() di sini karena tidak relevan dengan Quick Links
     renderLinks();
 }
 
@@ -282,5 +301,7 @@ function deleteLink(index) {
     renderLinks();
 }
 
-btnAddLink.addEventListener('click', addLink);
+if (btnAddLink) {
+    btnAddLink.addEventListener('click', addLink);
+}
 renderLinks();
