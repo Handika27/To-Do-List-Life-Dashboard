@@ -67,6 +67,8 @@ const timerDisplay = document.getElementById('timer-display');
 const btnStart = document.getElementById('btn-start');
 const btnStop = document.getElementById('btn-stop');
 const btnReset = document.getElementById('btn-reset');
+const timerInput = document.getElementById('timer-input');
+const btnSetTimer = document.getElementById('btn-set-timer');
 
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
@@ -74,6 +76,22 @@ function updateTimerDisplay() {
     timerDisplay.textContent = `${m}:${s}`;
 }
 
+btnSetTimer.addEventListener('click', () => {
+    if (isTimerRunning) {
+        alert("Pause timer terlebih dahulu untuk mengubah waktu!");
+        return;
+    }
+
+    let customMinutes = parseInt(timerInput.value);
+
+    if (isNaN(customMinutes) || customMinutes <= 0) {
+        customMinutes = 25; 
+        timerInput.value = 25;
+    }
+
+    timeLeft = customMinutes * 60;
+    updateTimerDisplay();
+});
 btnStart.addEventListener('click', () => {
     if (!isTimerRunning) {
         isTimerRunning = true;
@@ -97,7 +115,7 @@ btnStart.addEventListener('click', () => {
                     alarmSound.pause();
                     alarmSound.currentTime = 0;
                 }, 3000);
-                
+
                 alert("Focus session complete!");
             }
         }, 1000);
@@ -112,7 +130,8 @@ btnStop.addEventListener('click', () => {
 btnReset.addEventListener('click', () => {
     clearInterval(timerInterval);
     isTimerRunning = false;
-    timeLeft = 25 * 60;
+    let currentMinutes = parseInt(timerInput.value) || 25;
+    timeLeft = currentMinutes * 60;
     updateTimerDisplay();
 });
 updateTimerDisplay();
