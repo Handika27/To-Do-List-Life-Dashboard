@@ -1,6 +1,7 @@
 // --- 1. THEME & GREETING SETUP ---
 const themeToggleBtn = document.getElementById('theme-toggle');
 const userNameDisplay = document.getElementById('user-name-display');
+const alarmSound = new Audio('https://assets.mixkit.co/active_storage/sfx/989/989-preview.mp3');
 
 // Initialize Theme
 if (localStorage.getItem('theme') === 'dark') {
@@ -76,6 +77,13 @@ function updateTimerDisplay() {
 btnStart.addEventListener('click', () => {
     if (!isTimerRunning) {
         isTimerRunning = true;
+        // --- BEEP SAAT START ---
+        alarmSound.play();
+        setTimeout(() => { 
+            alarmSound.pause(); 
+            alarmSound.currentTime = 0; 
+        }, 1000);
+
         timerInterval = setInterval(() => {
             if (timeLeft > 0) {
                 timeLeft--;
@@ -83,6 +91,13 @@ btnStart.addEventListener('click', () => {
             } else {
                 clearInterval(timerInterval);
                 isTimerRunning = false;
+                // --- BEEP SAAT SELESAI (00:00) ---
+                alarmSound.play();
+                setTimeout(() => {
+                    alarmSound.pause();
+                    alarmSound.currentTime = 0;
+                }, 3000);
+                
                 alert("Focus session complete!");
             }
         }, 1000);
