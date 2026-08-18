@@ -14,7 +14,7 @@ themeToggleBtn.addEventListener('click', () => {
 });
 
 // Initialize Custom Name
-let userName = localStorage.getItem('userName') || 'Handika';
+let userName = localStorage.getItem('userName') || 'Champion!';
 if (userNameDisplay) userNameDisplay.textContent = userName;
 
 // Update Time, Date, and Greeting
