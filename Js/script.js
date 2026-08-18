@@ -102,7 +102,8 @@ if (btnStart) {
     btnStart.addEventListener('click', () => {
         if (!isTimerRunning) {
             isTimerRunning = true;
-            // --- BEEP SAAT START ---
+            
+            // --- BEEP SAAT START (Tetap 1 detik) ---
             alarmSound.play();
             setTimeout(() => { 
                 alarmSound.pause(); 
@@ -113,17 +114,27 @@ if (btnStart) {
                 if (timeLeft > 0) {
                     timeLeft--;
                     updateTimerDisplay();
+                    
+                    // --- REVISI: MULAI BEEP SAAT SISA 3 DETIK (00:03) ---
+                    if (timeLeft === 3) {
+                        alarmSound.currentTime = 0;
+                        alarmSound.play();
+                    }
+
                 } else {
+                    // --- SAAT WAKTU HABIS (00:00) ---
                     clearInterval(timerInterval);
                     isTimerRunning = false;
-                    // --- BEEP SAAT SELESAI (00:00) ---
-                    alarmSound.play();
-                    setTimeout(() => {
-                        alarmSound.pause();
-                        alarmSound.currentTime = 0;
-                    }, 3000);
+                    
+                    // Langsung matikan suara secara paksa
+                    alarmSound.pause();
+                    alarmSound.currentTime = 0;
 
-                    alert("Focus session complete!");
+                    // Trik: Gunakan jeda 10 milidetik agar layar sempat berubah 
+                    // menjadi "00:00" sebelum terblokir oleh popup alert
+                    setTimeout(() => {
+                        alert("Focus session complete!");
+                    }, 10);
                 }
             }, 1000);
         }
@@ -134,6 +145,11 @@ if (btnStop) {
     btnStop.addEventListener('click', () => {
         clearInterval(timerInterval);
         isTimerRunning = false;
+        
+        // REVISI: Pastikan suara ikut mati jika user menekan Pause 
+        // saat timer berada di detik 00:02 atau 00:01
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
     });
 }
 
@@ -141,6 +157,11 @@ if (btnReset) {
     btnReset.addEventListener('click', () => {
         clearInterval(timerInterval);
         isTimerRunning = false;
+        
+        // REVISI: Pastikan suara ikut mati saat di-Reset
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+        
         // Kembali ke waktu yang terakhir disetel user
         timeLeft = customMinutes * 60;
         updateTimerDisplay();
